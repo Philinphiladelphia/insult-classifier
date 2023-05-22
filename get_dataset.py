@@ -21,6 +21,8 @@ MAX_COMMENTS_PER_POST = 10
 
 IMAGE_LIMIT = 100
 
+BUILD_CSVS = False
+
 class ClassifierType(Enum):
 	HAAR_CASCADE = 0
 	DEEP_LEARNING = 1
@@ -67,7 +69,7 @@ class FaceClassifier:
 		image_names = []
 
 		# Iterate through top submissions
-		for submission in subreddit.top(limit=IMAGE_LIMIT):
+		for submission in subreddit.hot(limit=IMAGE_LIMIT):
 
 			if submission.score <= MINIMUM_POST_UPVOTES:
 				continue
@@ -84,14 +86,38 @@ class FaceClassifier:
 			else:
 				continue
 
+			comment_num = 0
 			for top_level_comment in submission.comments:
-				if isinstance(top_level_comment, praw):
-					continue
+				comment_num+=1
 
-				if top_level_comment.score >= (MINIMUM_POST_UPVOTES*MINIMUM_COMMENT_PERCENT):
-					continue
+				if comment_num > MAX_COMMENTS_PER_POST:
+					break
 
-				print(top_level_comment.body)
+				try:
+					if top_level_comment.score <= (MINIMUM_POST_UPVOTES*MINIMUM_COMMENT_PERCENT):
+						continue
+
+					print(top_level_comment.body)
+
+					if BUILD_CSVS:
+						while True:
+							letter = input("y/n/s?")
+
+							if letter == 'y':
+								file = open("comment_classification_data\good_insult.csv", "a")  # append mode
+								file.write(top_level_comment.body + '\n')
+								file.close()
+								break
+							if letter == 'n':
+								f = open("comment_classification_data\\bad_insult.csv", "a")  # append mode
+								f.write(top_level_comment.body + '\n')
+								f.close()
+								break
+							if letter == 's':
+								break
+				
+				except:
+					pass
 
 		return image_names
 
