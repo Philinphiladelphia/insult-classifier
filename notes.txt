@@ -1,0 +1,25 @@
+After we extract facial features from each photo, i want to perform unsupervised clustering on all the features so that we'll have a larger pool of insults to draw from for each photo.
+Alternatively, I just take the (n) insults with highest confidence?
+
+presence of emojis (include emojis, because it would be hilarious)
+
+Keep a queue-based cache of all comments read in the last 5 minutes. If user exhausts a cluster, then default to "Chortle my balls"
+
+Run multiple different voice generators, and a device to switch between them?
+
+Have a compliment mode, to praise someone with r/toastme?
+
+To identify good insults:
+make a CSV file with a bunch of good insults
+extract fe
+
+
+Dummy stretch goal: train on new dataset to add a different voice?
+
+*********************************************
+3D printed case
+
+Interface
+- on/off button
+- charging port
+- 10-option dial with multiple voice models
