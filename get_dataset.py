@@ -5,6 +5,7 @@ import math
 import numpy as np
 from enum import Enum
 import argparse
+import json
 
 IMAGE_HEIGHT = 200 # pixels
 FACE_MARGIN = 40 # pixels
@@ -68,6 +69,8 @@ class FaceClassifier:
 		subreddit = reddit.subreddit("RoastMe")
 		image_names = []
 
+		comment_json = {}
+
 		# Iterate through top submissions
 		for submission in subreddit.hot(limit=IMAGE_LIMIT):
 
@@ -97,8 +100,12 @@ class FaceClassifier:
 					if top_level_comment.score <= (MINIMUM_POST_UPVOTES*MINIMUM_COMMENT_PERCENT):
 						continue
 
-					print(top_level_comment.body)
-
+					if comment_json.has_key("url"):
+						comment_json[url].append(top_level_comment.body)
+					else:
+						comment_json[url] = [top_level_comment.body]
+                                        
+                                        # Label comments into then good/bad files for better processing
 					if BUILD_CSVS:
 						while True:
 							letter = input("y/n/s?")
@@ -119,16 +126,13 @@ class FaceClassifier:
 				except:
 					pass
 
-		return image_names
+		comment_string = json.dumps(comment_json)
+		file = open("comment_classification_data\comments.json", "a")  # append mode
+		file.write(comment_string)
+		file.close()
 
-	def url_to_image(self, url):
-		# download the image, convert it to a NumPy array, and then read
-		# it into OpenCV format
-		resp = urllib.request.urlopen(url)
-		image = np.asarray(bytearray(resp.read()), dtype="uint8")
-		image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-		# return the image
-		return image
+        
+		return image_names
 
 class HaarClassifier(FaceClassifier):
 	def __init__(self):
@@ -200,3 +204,10 @@ if not model_found:
 
 
 fc.get_reddit_images_and_text()
+import praw
+import urllib
+import cv2
+import math
+import numpy as np
+from enum import Enum
+import argparse
